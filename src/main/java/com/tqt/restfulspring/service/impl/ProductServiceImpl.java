@@ -9,7 +9,6 @@ import com.tqt.restfulspring.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,12 +43,6 @@ public class ProductServiceImpl implements ProductService {
         if (productDTO.getCategoryId() != null) {
             category = categoryRepository.findById(productDTO.getCategoryId()).orElse(null);
         }
-//        Product product = Product.builder()
-//                .name(productDTO.getName())
-//                .price(productDTO.getPrice())
-//                .description(productDTO.getDescription())
-//                .category(category)
-//                .build();
 
         Product product = new Product(
                 productDTO.getName(),
@@ -78,7 +71,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public int deleteProduct(Long id) {
-        return 0;
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            return 0;
+        } else {
+            productRepository.delete(product);
+            return 1;
+        }
     }
 
     @Override
