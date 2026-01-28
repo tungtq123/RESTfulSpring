@@ -48,14 +48,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean login(String username, String password) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            User user = userRepository.findByUsernameAndPassword(username, password);
-            if (user != null) {
-                return true;
-            }
-        }
-        return false;
+    public UserDTO login(String username, String password) {
+        User user = userRepository.findByUsernameAndPassword(username, password).orElse(null);
+        return user != null ? convertToDTO(user) : null;
+    }
+
+    private UserDTO convertToDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setUsername(user.getUsername());
+        dto.setPassword(user.getPassword());
+        dto.setRole(user.getRole().getName());
+        return dto;
     }
 
     @Override
@@ -63,5 +66,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(user -> {
             return new UserDTO(user.getUserId(), user.getUsername(), user.getPassword(), user.getEmail(), user.getRole().getId(), user.getRole().getName());
         }).toList();
+    }
+
+    @Override
+    public UserDTO findByUsernameAndPassword(String username, String password) {
+        User user = userRepository.findByUsernameAndPassword(username, password).orElse(null);
+        return user != null ? convertToDTO(user) : null;
     }
 }

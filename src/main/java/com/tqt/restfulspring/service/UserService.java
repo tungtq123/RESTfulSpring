@@ -9,6 +9,8 @@ public interface UserService {
     UserDTO createUser(UserDTO userDTO);
     UserDTO updateUser(UserDTO userDTO);
     int deleteUser(String username);
-    boolean login(String username, String password);
+    UserDTO login(String username, String password);
     List<UserDTO> getAllUsers();
+    UserDTO findByUsernameAndPassword(String username, String password);
+
 }

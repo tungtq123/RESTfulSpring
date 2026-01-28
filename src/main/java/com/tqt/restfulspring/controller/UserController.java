@@ -35,12 +35,9 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        boolean result = userService.login(username, password);
-        if (result) {
-            return ResponseEntity.ok("Login successful");
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to login!");
+    public ResponseEntity<UserDTO> login(@RequestParam String username, @RequestParam String password) {
+        UserDTO user = userService.findByUsernameAndPassword(username, password);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
 }
