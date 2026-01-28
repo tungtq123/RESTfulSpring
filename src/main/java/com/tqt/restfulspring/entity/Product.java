@@ -26,4 +26,11 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    public Product(String name, double price, String description, Category category) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.category = category;
+    }
 }

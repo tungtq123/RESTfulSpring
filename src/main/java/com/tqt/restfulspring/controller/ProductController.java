@@ -1,8 +1,11 @@
 package com.tqt.restfulspring.controller;
 
 import com.tqt.restfulspring.dto.ProductDTO;
+import com.tqt.restfulspring.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,44 +17,44 @@ import java.util.Optional;
 @RequestMapping("/api/products")
 @Tag(name = "Product API", description = "Product API")
 public class ProductController {
-
-    private List<ProductDTO> products = new ArrayList<>();
-
-    @PostConstruct
-    public void init(){
-        products.add(new ProductDTO(1L, "Laptop", 1200.00, "Powerful laptop for work and gaming"));
-        products.add(new ProductDTO(2L, "Mouse", 25, "Wireless optical mouse"));
-        products.add(new ProductDTO(3L, "Keyboard", 75, "Mechanical keyboard with lightning"));
-    }
+    @Autowired
+    private ProductService productService;
 
     @GetMapping("")
-    public ResponseEntity<List<ProductDTO>> getAllProducts(){
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        List<ProductDTO> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id){
-        Optional<ProductDTO> productDTO = products.stream().filter(p -> p.getId() == id).findFirst();
-        return productDTO.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
+        ProductDTO product = productService.getProductById(id);
+        return product != null ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO){
-        long newId = products.size() + 1;
-        productDTO.setId(newId);
-        products.add(productDTO);
-        return ResponseEntity.ok(productDTO);
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+        ProductDTO createdProduct = productService.createProduct(productDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<List<ProductDTO>> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO){
-        Optional<ProductDTO> product = products.stream().filter(p -> p.getId() == id).findFirst();
-        product.ifPresent(p -> {
-            p.setName(productDTO.getName());
-            p.setPrice(productDTO.getPrice());
-            p.setDescription(productDTO.getDescription());
-        });
-        return ResponseEntity.ok(products);
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+        ProductDTO existingProduct = productService.updateProduct(id, productDTO);
+        if (existingProduct != null) {
+            return ResponseEntity.ok(existingProduct);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        int result = productService.deleteProduct(id);
+        if (result > 0) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
