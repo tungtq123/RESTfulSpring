@@ -16,4 +16,4 @@ WORKDIR /app
 COPY --from=build /app/target/RESTfulSpring-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.war"]
+ENTRYPOINT ["java","-jar","app.jar"]
