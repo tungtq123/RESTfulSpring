@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             User newUser = user.get();
-            return new UserDTO(newUser.getUserId(), newUser.getUsername(), newUser.getPassword(), newUser.getEmail(), newUser.getRole().getId(), newUser.getRole().getName());
         }
         return null;
     }
